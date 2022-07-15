@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 import pytest
 import time
 import pandas as pd
@@ -5,48 +7,122 @@ import pyodbc
 import traceback
 from variables import server, database, username, password
 
-def connect_db(server, database, username, password, maxAttempts, waitBetweenAttemptsSeconds):
-    """
-    Establish connection to db before the maxAttempts number is reached
-    Conversely returns False
-    pyodbc.connect has a built-in timeout. Use a waitBetweenAttemptsSeconds greater than zero to add a delay on top of this timeout
-    """
-    for attemptNumber in range(maxAttempts):
-        cnxn = None
-        try:
-            cnxn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
-            cursor = cnxn.cursor()
-        except Exception as e:
-            print(traceback.format_exc())
-        finally:
-            if cnxn:
-                print("The DB is up and running: ")
-                return cursor
-            else:
-                print("DB not running yet on attempt number " + str(attemptNumber))
-            time.sleep(waitBetweenAttemptsSeconds)
-    print("Max attempts waiting for DB to come online exceeded")
-    return False
-#
-# # Invoking this fixture: 'function_scoped_container_getter' starts all services
-# @pytest.fixture(scope="function")
-# def wait_db_wrapper():
-#     """Wait for the api from my_api_service to become responsive"""
-#     server = 'localhost,54866'
-#     database = 'TRN'
-#     username = 'test_user'
-#     password = '1234'
-#     return waitDb(server, database, username, password, 3, 5)
-#
-#
-@pytest.mark.regions_table_test
-def test_counts():
-    """
-    The DB is now good to go and tests can interact with it
-    The only assertion performed here is if waitDb returned True and a
-    """
-    cursor = connect_db(server, database, username, password, 3, 5)
-    res = cursor.execute('SELECT count(*) FROM hr.regions').fetchall()
-    result = res[0][0]
-    assert result == 4
 
+class MsDb:
+    """ Collection of helper methods to query the MS SQL Server database.
+    """
+
+    def __init__(self, username, password, server, initial_db='dev_db'):
+        self.username = username
+        self._password = password
+        self.server = server
+        self.db = initial_db
+        conn_str = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + self.server + ';DATABASE=' + self.db + ';UID=' + self.username + ';PWD=' + self._password + ';'
+        print('Connected to DB:', conn_str)
+        self._connection = pyodbc.connect(conn_str)
+        pyodbc.pooling = False
+
+    def __repr__(self):
+        return f"MS-SQLServer('{self.username}', <password hidden>, '{self.server}', '{self.db}')"
+
+    def __str__(self):
+        return f"MS-SQLServer Module for STP on {self.server}"
+
+    def __del__(self):
+        self._connection.close()
+        print("Connection closed.")
+
+    @contextmanager
+    def cursor(self, commit: bool = False):
+        """
+        A context manager style of using a DB cursor for database operations.
+        This function should be used for any database queries or operations that
+        need to be done.
+
+        :param commit:
+        A boolean value that says whether to commit any database changes to the database. Defaults to False.
+        :type commit: bool
+        """
+        cursor = self._connection.cursor()
+        try:
+            yield cursor
+        except pyodbc.DatabaseError as err:
+            print("DatabaseError {} ".format(err))
+            cursor.rollback()
+            raise err
+        else:
+            if commit:
+                cursor.commit()
+        finally:
+            cursor.close()
+
+
+ms_db = MsDb(username=username, password=password, server=server, initial_db=database)
+
+
+class TestTrnDB:
+    @pytest.mark.jobs_table_tests
+    def test_jobs_average_salary(self):
+        """
+        Verify average min salary from jobs table
+
+        *Setup:*
+        0. Connect 'TRN' DB
+
+        *Test Steps:*
+        1. Query average min_salary from jobs table.
+
+        *Expected result:*
+        0. Jobs table is present in TRN DB.
+        1. Query executed successfully.
+        2. Jobs table average min_salary was calculated as expected.
+        """
+        with ms_db.cursor() as cursor:
+            cursor.execute('select cast(avg(min_salary) as int) from hr.jobs')
+            output = cursor.fetchall()
+            result = output[0][0]
+            assert result == 6568
+
+    @pytest.mark.jobs_table_tests
+    def test_highest_paid_job(self):
+        """
+        Verify highest paid job from jobs table
+
+        *Setup:*
+        0. Connect 'TRN' DB
+
+        *Test Steps:*
+        1. Query job_title with maximum max_salary from jobs table.
+
+        *Expected result:*
+        0. Jobs table is present in TRN DB.
+        1. Query executed successfully.
+        2. Jobs table job_title with maximum max_salary was calculated as expected.
+        """
+        with ms_db.cursor() as cursor:
+            cursor.execute('select job_title from hr.jobs where max_salary = (select max(max_salary) from hr.jobs)')
+            output = cursor.fetchall()
+            result = output[0][0]
+            assert result == 'President'
+
+    @pytest.mark.employees_table_tests
+    def test_employees_count(self):
+        """
+        Verify employees count from employees table
+
+        *Setup:*
+        0. Connect 'TRN' DB
+
+        *Test Steps:*
+        1. Query count employees from employees table.
+
+        *Expected result:*
+        0. Employees table is present in TRN DB.
+        1. Query executed successfully.
+        2. Employees count was calculated as expected.
+        """
+        with ms_db.cursor() as cursor:
+            cursor.execute('select count(employee_id) from hr.employees')
+            output = cursor.fetchall()
+            result = output[0][0]
+            assert result == 40
