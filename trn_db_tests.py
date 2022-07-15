@@ -126,3 +126,69 @@ class TestTrnDB:
             output = cursor.fetchall()
             result = output[0][0]
             assert result == 40
+
+    @pytest.mark.employees_table_tests
+    def test_earliest_hired_employee(self):
+        """
+        Verify earliest hired employee from employees table
+
+        *Setup:*
+        0. Connect 'TRN' DB
+
+        *Test Steps:*
+        1. Query earliest hired employee from employees table.
+
+        *Expected result:*
+        0. Employees table is present in TRN DB.
+        1. Query executed successfully.
+        2. Employee_id was calculated as expected.
+        """
+        with ms_db.cursor() as cursor:
+            cursor.execute('select employee_id from hr.employees where hire_date = (select max(hire_date) from hr.employees)')
+            output = cursor.fetchall()
+            result = output[0][0]
+            assert result == 179
+
+    @pytest.mark.countries_table_tests
+    def test_countries_count_from_europe_and_asia(self):
+        """
+        Verify european and asian countries count from countries table
+
+        *Setup:*
+        0. Connect 'TRN' DB
+
+        *Test Steps:*
+        1. Query european and asian countries count from countries table.
+
+        *Expected result:*
+        0. Countries table is present in TRN DB.
+        1. Query executed successfully.
+        2. Countries count was calculated as expected.
+        """
+        with ms_db.cursor() as cursor:
+            cursor.execute('select count(*) from hr.countries where region_id in (1, 3)')
+            output = cursor.fetchall()
+            result = output[0][0]
+            assert result == 14
+
+    @pytest.mark.countries_table_tests
+    def test_countries_region_id_in_range_of_expected_values(self):
+        """
+        Verify countries region id in expected range of values from countries table
+
+        *Setup:*
+        0. Connect 'TRN' DB
+
+        *Test Steps:*
+        1. Query region ids from coutries table out of expected range.
+
+        *Expected result:*
+        0. Countries table is present in TRN DB.
+        1. Query executed successfully.
+        2. Countries ids are in range of expected values.
+        """
+        with ms_db.cursor() as cursor:
+            cursor.execute('select count(*) from hr.countries where region_id > 4 and region_id < 1')
+            output = cursor.fetchall()
+            result = output[0][0]
+            assert result == 0
