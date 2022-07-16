@@ -1,7 +1,6 @@
-from contextlib import contextmanager
-
 import pytest
 import pyodbc
+from contextlib import contextmanager
 from variables import server, database, username, password
 
 
