@@ -1,10 +1,7 @@
 from contextlib import contextmanager
 
 import pytest
-import time
-import pandas as pd
 import pyodbc
-import traceback
 from variables import server, database, username, password
 
 
@@ -17,7 +14,10 @@ class MsDb:
         self._password = password
         self.server = server
         self.db = initial_db
-        conn_str = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + self.server + ';DATABASE=' + self.db + ';UID=' + self.username + ';PWD=' + self._password + ';'
+        conn_str = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER=' + self.server +\
+                   ';DATABASE=' + self.db + \
+                   ';UID=' + self.username + \
+                   ';PWD=' + self._password + ';'
         print('Connected to DB:', conn_str)
         self._connection = pyodbc.connect(conn_str)
         pyodbc.pooling = False
@@ -144,7 +144,8 @@ class TestTrnDB:
         2. Employee_id was calculated as expected.
         """
         with ms_db.cursor() as cursor:
-            cursor.execute('select employee_id from hr.employees where hire_date = (select max(hire_date) from hr.employees)')
+            cursor.execute(
+                'select employee_id from hr.employees where hire_date = (select max(hire_date) from hr.employees)')
             output = cursor.fetchall()
             result = output[0][0]
             assert result == 179
