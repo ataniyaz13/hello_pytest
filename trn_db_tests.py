@@ -58,7 +58,7 @@ from variables import server, database, username, password
 #
 # ms_db = MsDb(username=username, password=password, server=server, initial_db=database)
 
-conn = pyodbc.connect('DRIVER={ODBC Driver 13 for SQL Server};SERVER=' + 'localhost,54866' + ';DATABASE=' + 'TRN' + ';UID=' + 'test_user' + ';PWD=' + '1234' + ';')
+conn = pyodbc.connect('DRIVER={ODBC Driver 18 for SQL Server};SERVER=' + 'localhost,54866' + ';DATABASE=' + 'TRN' + ';UID=' + 'test_user' + ';PWD=' + '1234' + ';')
 cursor = conn.cursor()
 cursor.execute('select count(employee_id) from hr.employees')
 output = cursor.fetchall()
