@@ -22,7 +22,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'rf_user', usernameVariable: 'Username', passwordVariable: 'Password')]) {
                     echo "Merging..."
                     sh '''
-                        git checkout -b production
+                        git checkout production
                         git merge origin/add_jenkinsfile
                     '''
                 }
