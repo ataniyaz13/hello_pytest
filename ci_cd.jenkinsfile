@@ -15,7 +15,7 @@ pipeline {
                     def test_results = sh (script: "pytest trn_db_tests.py -v", returnStatus: true)
                     echo "Status code of tests execution: ${test_results}"
                 }
-                archiveArtifacts artifacts: '$JENKINS_HOME/jobs/$JOB_NAME/builds/lastSuccessfulBuild/log', onlyIfSuccessful: true
+                archiveArtifacts artifacts: '${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log', onlyIfSuccessful: true
             }
         }
         stage('Merge to production') {
@@ -30,7 +30,8 @@ pipeline {
                         git merge origin/master
                         git push https://${Username}:${Token}@github.com/ataniyaz13/hello_pytest.git production -f
                     '''
-                    sh "ls -la $JENKINS_HOME/jobs/$JOB_NAME/builds/lastSuccessfulBuild/"
+                    sh "ls -la ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}
+"
                 }
             }
         }
