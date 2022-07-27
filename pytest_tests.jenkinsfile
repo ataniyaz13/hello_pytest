@@ -26,7 +26,7 @@ pipeline {
                     echo "Merging..."
                     sh '''
                         git checkout production
-                        git merge origin/add_jenkinsfile
+                        git merge origin/master
                         git push https://${Username}:${Token}@github.com/ataniyaz13/hello_pytest.git production -f
                     '''
                 }
