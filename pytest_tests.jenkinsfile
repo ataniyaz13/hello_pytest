@@ -19,7 +19,7 @@ pipeline {
         }
         stage('Merge to production') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'ata')]) {
+                withCredentials([usernamePassword(credentialsId: 'rf_user')]) {
                     echo "Merging..."
                     sh '''
                         git checkout -b production
