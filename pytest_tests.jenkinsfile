@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Prepare workspace') {
+            steps {
+               echo "Start installing dependencies"
+               sh "pip install -r requirements.txt"
+            }
+        }
+        stage('Run tests') {
+            steps {
+                script {
+                    echo "Start running test cases"
+                    def test_results = sh (script: "pytest trn_db_tests.py -v", returnStatus: true)
+                    echo "Status code of tests execution: ${test_results}"
+                }
+            }
+        }
+        stage('Merge to production') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'ata',
+                    usernameVariable: 'Username',
+                    passwordVariable: 'Token')]) {
+                    echo "Merging..."
+                    sh '''
+                        git checkout production
+                        git merge origin/master
+                        git push https://${Username}:${Token}@github.com/ataniyaz13/hello_pytest.git production -f
+                    '''
+                }
+            }
+        }
+    }
+}
