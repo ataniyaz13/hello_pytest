@@ -15,7 +15,7 @@ pipeline {
                     def test_results = sh (script: "pytest trn_db_tests.py -v", returnStatus: true)
                     echo "Status code of tests execution: ${test_results}"
                 }
-                archiveArtifacts artifacts: '**/*.txt', onlyIfSuccessful: true
+                archiveArtifacts artifacts: '$JENKINS_HOME/jobs/$JOB_NAME/builds/lastSuccessfulBuild/log', onlyIfSuccessful: true
             }
         }
         stage('Merge to production') {
