@@ -15,7 +15,6 @@ pipeline {
                     echo "Start running test cases"
                     test_results = sh (
                        script: "pytest trn_db_tests.py -v",
-    //                    returnStdout: true,
                        returnStdout: true
                    )
                 }
