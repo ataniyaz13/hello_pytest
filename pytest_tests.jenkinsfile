@@ -19,12 +19,12 @@ pipeline {
         }
         stage('Merge to production') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'rf_user', usernameVariable: 'ataniyaz13', passwordVariable: 'Password')]) {
+                withCredentials([usernamePassword(credentialsId: 'ata', usernameVariable: 'Username', passwordVariable: 'Password')]) {
                     echo "Merging..."
                     sh '''
                         git checkout production
                         git merge origin/add_jenkinsfile
-                        git push origin production
+                        git push -u origin production
                     '''
                 }
             }
