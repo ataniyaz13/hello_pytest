@@ -11,13 +11,14 @@ pipeline {
         }
         stage('Run tests') {
             steps {
-                echo "Start running test cases"
-                test_results = sh (
-                   script: "pytest trn_db_tests.py -v",
-//                    returnStdout: true,
-                   returnStatus: true
-               ) == 0
-               echo "Tests results: ${TESTS_RESULTS}"
+                script {
+                    echo "Start running test cases"
+                    test_results = sh (
+                       script: "pytest trn_db_tests.py -v",
+    //                    returnStdout: true,
+                       returnStdout: true
+                   )
+                }
             }
         }
         stage('Merge to production') {
