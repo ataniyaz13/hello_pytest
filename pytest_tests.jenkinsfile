@@ -12,8 +12,8 @@ pipeline {
         stage('Run tests') {
             steps {
                 echo "Start running test cases"
-                TESTS_RESULTS = sh (
-                   @script: "pytest trn_db_tests.py -v",
+                test_results = sh (
+                   script: "pytest trn_db_tests.py -v",
 //                    returnStdout: true,
                    returnStatus: true
                ) == 0
