@@ -32,7 +32,6 @@ pipeline {
                     sh "cp ${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log log.txt"
                 }
                 archiveArtifacts artifacts: '**/log.txt', onlyIfSuccessful: true
-
             }
         }
     }
