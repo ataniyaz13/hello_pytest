@@ -23,8 +23,8 @@ pipeline {
                     echo "Merging..."
                     sh '''
                         git checkout -b production
-                        git merge add_jenkinsfile
                     '''
+                    sh "git merge add_jenkinsfile"
                 }
             }
         }
