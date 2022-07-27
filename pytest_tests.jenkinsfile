@@ -14,7 +14,7 @@ pipeline {
                 script {
                     echo "Start running test cases"
                     def test_results = sh (script: "pytest trn_db_tests.py -v", returnStatus: true)
-                    echo "${test_results}"
+                    echo "Status code: ${test_results}"
                 }
             }
         }
