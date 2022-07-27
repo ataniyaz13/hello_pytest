@@ -20,13 +20,12 @@ pipeline {
         stage('Merge to production') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'ata')]) {
-                    echo "Merging...""
+                    echo "Merging..."
                     sh '''
                         git checkout -b production
                         git merge add_jenkinsfile
                     '''
                 }
-
             }
         }
     }
