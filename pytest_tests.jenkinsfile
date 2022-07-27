@@ -21,7 +21,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'rf_user', usernameVariable: 'Username', passwordVariable: 'Password')]) {
                     echo "Merging..."
-                    sh ''' git push origin add_jenkinsfile:production'''
+                    sh ''' git push origin origin/add_jenkinsfile:production'''
 //                         git checkout production
 //                         git merge origin/add_jenkinsfile
 
