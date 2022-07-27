@@ -30,6 +30,7 @@ pipeline {
                         git merge origin/master
                         git push https://${Username}:${Token}@github.com/ataniyaz13/hello_pytest.git production -f
                     '''
+                    sh "ls -la $JENKINS_HOME/jobs/$JOB_NAME/builds/lastSuccessfulBuild/"
                 }
             }
         }
