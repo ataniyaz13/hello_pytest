@@ -24,11 +24,11 @@ pipeline {
                     usernameVariable: 'Username',
                     passwordVariable: 'Token')]) {
                     echo "Merging..."
-                    sh """
+                    sh '''
                         git checkout production
                         git merge origin/master
                         git push https://${Username}:${Token}@github.com/ataniyaz13/hello_pytest.git production -f
-                    """
+                    '''
                 }
             }
         }
