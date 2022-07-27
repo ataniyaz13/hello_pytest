@@ -19,12 +19,15 @@ pipeline {
         }
         stage('Merge to production') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'ata', usernameVariable: 'Username', passwordVariable: 'Password')]) {
+                withCredentials([usernamePassword(
+                    credentialsId: 'ata',
+                    usernameVariable: 'Username',
+                    passwordVariable: 'Token')]) {
                     echo "Merging..."
                     sh '''
                         git checkout production
                         git merge origin/add_jenkinsfile
-                        git push -u origin production
+                        git push https://${Username}:${Token}@github.com/ataniyaz13/hello_pytest.git add_jenkinsfile -f
                     '''
                 }
             }
