@@ -13,13 +13,13 @@ pipeline {
                 script {
                     echo "Start running test cases"
                     def test_results = sh (script: "pytest trn_db_tests.py -v", returnStatus: true)
-                    echo "Status code: ${test_results}"
+                    echo "Status code of tests execution: ${test_results}"
                 }
             }
         }
         stage('Merge to production') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'rf_user')]) {
+                withCredentials([usernamePassword(credentialsId: 'rf_user', usernameVariable: 'Username', passwordVariable: 'Password')]) {
                     echo "Merging..."
                     sh '''
                         git checkout -b production
