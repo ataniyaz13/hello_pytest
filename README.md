@@ -1,24 +1,26 @@
 # Environment setup
 
-## Create virtual environment for tests execution
+## Create jenkins docker container for tests execution
 ```bash
 Ubuntu:
 cd hello_pytest
-python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
+docker build -t jenkins:pytest .
+docker run -p 8080:8080 -v /user/home/var/jenkins_home jenkins:pytest
 
 Windows:
 cd hello_pytest
-python -m venv venv && source venv/Scripts/activate.bat
-pip install -r requirements.txt
+docker build -t jenkins:pytest .
+docker run -p 8080:8080 -v /user/home/var/jenkins_home jenkins:pytest
 ```
 
-## Deploy and configure Data Quality solution
-Follow [instructions](../README.md)
 
-
-## Run pytest tests execution
-Start tests with `pytest` 
+## Create and configure jenkins pipeline
+```bash
+Create ci/cd pipeline project and configure script path to "ci_cd.jenkinsfile" from repository
+Activate "Poll SCM" and put "* * * * *" to Schedule field
+Choose in "Additional Behaviours" option "Don't trigger a build on commit notifications"
 ```
-pytest trn_db_tests.py -v --html=pytest_report.html
+## Run pipeline
+```bash
+Run created ci/cd pipeline
 ```
